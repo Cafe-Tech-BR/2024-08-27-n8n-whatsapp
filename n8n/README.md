@@ -6,7 +6,8 @@ Este repositório contém uma coleção de workflows exportados do n8n que podem
 1. [Descrição dos Workflows](#descrição-dos-workflows)
 2. [Como Importar Workflows no n8n](#como-importar-workflows-no-n8n)
 3. [Executando o n8n com Docker Compose](#executando-o-n8n-com-docker-compose)
-4. [Contribuições](#contribuições)
+4. [Testando a Integração do Twilio/WhatsApp](#testando-a-integração-do-twilio-whatsapp)
+5. [Contribuições](#contribuições)
 
 ## Descrição dos Workflows
 
@@ -46,7 +47,6 @@ Você pode executar o n8n localmente usando o Docker Compose. Para isso, siga os
 
 4. Acesse o n8n em [http://localhost:5678](http://localhost:5678).
 
-
 ### Linux
 
 1. Certifique-se de ter o Docker e o Docker Compose instalados.
@@ -59,6 +59,7 @@ Você pode executar o n8n localmente usando o Docker Compose. Para isso, siga os
 
 4. Acesse o n8n em [http://localhost:5678](http://localhost:5678).
 
+*Caso necessário, insira uma imagem do terminal Linux e da interface do Docker.*
 
 ### Mac
 
@@ -71,3 +72,11 @@ Você pode executar o n8n localmente usando o Docker Compose. Para isso, siga os
    ```
 
 4. Acesse o n8n em [http://localhost:5678](http://localhost:5678).
+
+## Testando a Integração do Twilio/WhatsApp
+
+Se você deseja testar os exemplos com integração do Twilio/WhatsApp, será necessário expor sua instância do n8n para a internet usando ferramentas como [ngrok](https://ngrok.com/) ou [Cloudflare Tunnels](https://www.cloudflare.com/pt-br/zero-trust/products/access/). Essas ferramentas permitem que você crie um túnel seguro para sua aplicação local, tornando-a acessível a partir da internet.
+
+## Contribuições
+
+Sinta-se à vontade para contribuir com melhorias. Basta abrir um pull request ou uma issue.
