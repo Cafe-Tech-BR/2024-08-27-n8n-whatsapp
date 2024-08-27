@@ -1,0 +1,400 @@
+{
+  "name": "Evento #2 - Clínica Médica - Agente Virtual - Completo",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "com.twilio.messaging.inbound-message.received"
+        ]
+      },
+      "id": "1a67d0d2-6334-4ba1-83c7-0ab54c6c1c4d",
+      "name": "Twilio Trigger",
+      "type": "n8n-nodes-base.twilioTrigger",
+      "typeVersion": 1,
+      "position": [
+        140,
+        380
+      ],
+      "webhookId": "69627b5e-3f40-4022-9e85-0c893c3f6621",
+      "notesInFlow": false,
+      "credentials": {
+        "twilioApi": {
+          "id": "cwe2d9hKRIZy9ZFf",
+          "name": "Twilio Cafe Tech"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14e0f131-096e-4de2-9cd6-b9af1e8ea06d",
+              "name": "chatInput",
+              "value": "={{ $json.data.body }}",
+              "type": "string"
+            },
+            {
+              "id": "cec37180-1383-4594-ac27-41161500800b",
+              "name": "from",
+              "value": "={{ $json.data.from }}",
+              "type": "string"
+            },
+            {
+              "id": "7df43a41-8228-412f-8e8c-2990829d8a0f",
+              "name": "to",
+              "value": "={{ $json.data.to }}",
+              "type": "string"
+            },
+            {
+              "id": "4ee7418e-1b76-4b53-9670-461c03823194",
+              "name": "sessionId",
+              "value": "={{ $json.data.from.split(':')[1] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "includeFields": "message.from.id, message.from.first_name, message.from.last_name, message.from.username, message.chat.type",
+        "options": {}
+      },
+      "id": "1867487f-e46a-4ad4-be9d-8ed9cacdf147",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "from": "={{ $('Edit Fields').item.json.to.split(':')[1] }}",
+        "to": "={{ $('Edit Fields').item.json.from.split(':')[1] }}",
+        "toWhatsapp": true,
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "id": "fc4a9361-19c7-4755-80b1-49fbb21cc431",
+      "name": "Twilio",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        300
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "cwe2d9hKRIZy9ZFf",
+          "name": "Twilio Cafe Tech"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "id": "2c5a3d43-0ad5-4192-8011-daca2857145d",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        760,
+        540
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "lJUVcRoqQHErCaIR",
+          "name": "OpenAi Cafe Tech"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "TiposDeExame",
+        "description": "Use essa ferramenta sempre que o paciente envie o nome de um exame médico ou uma lista de nomes de exames médicos.",
+        "jsCode": "let tiposExame = [\n  {\n    \"exame\": \"Hemograma\",\n    \"tipo\":\"AC\"\n  },\n  {\n    \"exame\": \"Creatinina\",\n    \"tipo\":\"AC\"\n  },\n  {\n    \"exame\": \"Uréia\",\n    \"tipo\":\"AC\"\n  },\n  {\n    \"exame\": \"Raio X\",\n    \"tipo\":\"IM\"\n  },\n  {\n    \"exame\": \"Ressonância\",\n    \"tipo\":\"IM\"\n  }\n]\n\nreturn `Sua tarefa é usar a informação abaixo para categorizar os exames solicitados, armazenar os dados corretamente para uso futuro e confirmar os detalhes com o paciente.\n\nLista de exames que a clínica é capaz de atender:\n\n${JSON.stringify(tiposExame)}\n\n\n#### Instruções:\n\n1. **Verificação e Classificação dos Exames:**\n   - Usando a informação da lista de exames possíveis, categorize os exames solicitados pelo paciente da seguinte forma:\n     - Lista de exames válidos/possíveis de atender.\n     - Lista de exames inválidos/inexistentes e que a clínica não atende.\n\n2. **Confirmação com o Paciente:**\n   - Apresente ao paciente:\n     - A lista de exames que a clínica atende.\n     - A lista de exames que a clínica não é capaz de atender.\n     - **Só exiba a lista que possuir exames.**\n\n3. **Confirmação de exames ou Ajustes:**\n   - O paciente pode confirmar que os exames estão corretos com frases do tipo \"está tudo certo\", \"ok\", \"sim\", \"👍\" e similares. Frases positivas e que não contenham nomes de exames.\n   - O paciente pode decidir adicionar novos exames na lista, por exemplo, digitando o nome de um exame ou \"adicionar XXX\" onde XXX é o nome de um exame. \n   - O paciente pode decidor remover um exame da lista.\n\n4. **Continuidade do Fluxo:**\n   - Após a confirmação do paciente, exiba as datas possíveis para cada exame válido listado pelo paciente.\n`"
+      },
+      "id": "94ab3157-d755-48c5-b9b3-443a2f366ced",
+      "name": "Tipos de Exame",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        1060,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "name": "DisponibilidadeExames",
+        "description": "Use essa ferramenta quando o paciente confirmar a lista de exames.\nSó chame a ferramenta novamente caso o paciente adicione novos exames. \nO input da ferramenta é baseado nos exames definidos pelo paciente e é um objeto JSON com o seguinte formato:\n{\n  \"pedido\": [{\n    \"exames\": [\"Hemograma\", ..., ...],\n    \"tipo\": \"AC\"\n  },{\n    \"exames\": [\"Ressonância\", ..., ...],\n    \"tipo\": \"IM\"\n  },{\n    \"exame\": [\"Exame Desconhecido\"],\n    \"tipo\": \"DESCONHECIDO\"\n  }]\n}\n",
+        "jsCode": "const data = [\n[\n  {\n    \"exame\": \"Hemograma\",\n    \"tipo\":\"AC\",\n    \"unidades\": [\n      {\n        \"nome\": \"Osasco\",\n        \"horarios\": [\n          \"2024-08-27 10:00:00\",\n          \"2024-08-27 11:00:00\"\n        ]\n      },\n      {\n        \"nome\": \"Tiradentes\",\n        \"horarios\": [\n          \"2024-08-27 12:00:00\",\n          \"2024-08-27 13:00:00\"\n        ]\n      },\n      {\n        \"nome\": \"Lapa\",\n        \"horarios\": [\n          \"2024-08-27 14:00:00\",\n          \"2024-08-27 15:00:00\"\n        ]\n      }\n    ]\n  },\n  {\n    \"exame\": \"Creatinina\",\n    \"tipo\":\"AC\",\n    \"unidades\": [\n      {\n        \"nome\": \"Osasco\",\n        \"horarios\": [\n          \"2024-08-27 10:00:00\",\n          \"2024-08-27 16:00:00\"\n        ]\n      },\n      {\n        \"nome\": \"Tiradentes\",\n        \"horarios\": [\n          \"2024-08-27 17:00:00\",\n          \"2024-08-27 18:00:00\"\n        ]\n      },\n      {\n        \"nome\": \"Lapa\",\n        \"horarios\": [\n          \"2024-08-27 19:00:00\",\n          \"2024-08-27 17:00:00\"\n        ]\n      }\n    ]\n  },\n  {\n    \"exame\": \"Uréia\",\n    \"tipo\":\"AC\",\n    \"unidades\": [\n      {\n        \"nome\": \"Osasco\",\n        \"horarios\": [\n          \"2024-08-27 10:00:00\",\n          \"2024-08-27 19:00:00\"\n        ]\n      },\n      {\n        \"nome\": \"Tiradentes\",\n        \"horarios\": [\n          \"2024-08-27 18:00:00\",\n          \"2024-08-27 21:00:00\"\n        ]\n      },\n      {\n        \"nome\": \"Lapa\",\n        \"horarios\": [\n          \"2024-08-27 20:00:00\",\n          \"2024-08-27 21:00:00\"\n        ]\n      }\n    ]\n  },\n  {\n    \"exame\": \"Raio X\",\n    \"tipo\":\"IM\",\n    \"unidades\": [\n      {\n        \"nome\": \"Osasco\",\n        \"horarios\": [\n          \"2024-08-27 10:00:00\",\n          \"2024-08-27 11:00:00\"\n        ]\n      },\n      {\n        \"nome\": \"Tiradentes\",\n        \"horarios\": [\n          \"2024-08-27 18:00:00\",\n          \"2024-08-27 21:00:00\"\n        ]\n      },\n      {\n        \"nome\": \"Lapa\",\n        \"horarios\": [\n          \"2024-08-27 20:00:00\",\n          \"2024-08-27 21:00:00\"\n        ]\n      }\n    ]\n  },\n  {\n    \"exame\": \"Ressonância\",\n    \"tipo\":\"IM\",\n    \"unidades\": [\n      {\n        \"nome\": \"Osasco\",\n        \"horarios\": [\n          \"2024-08-27 11:00:00\",\n          \"2024-08-27 12:00:00\"\n        ]\n      },\n      {\n        \"nome\": \"Tiradentes\",\n        \"horarios\": [\n          \"2024-08-27 18:00:00\",\n          \"2024-08-27 21:00:00\"\n        ]\n      },\n      {\n        \"nome\": \"Lapa\",\n        \"horarios\": [\n          \"2024-08-27 20:00:00\",\n          \"2024-08-27 21:00:00\"\n        ]\n      }\n    ]\n  }\n]\n  ]\nreturn `Abaixo um JSON com os exames e as datas de agendamento possíveis:\n\n${JSON.stringify(data)}\n\nAo exibir as datas ao paciente, caso existam múltiplos horários no mesmo dia, agrupe os horários separando por vírgula, para que a mensagem fique mais curta.\n\nÉ necessário **SEMPRE** considerar ANO, MÊS, DIA, HORA e MINUTO.\n\n`"
+      },
+      "id": "d8772541-1c69-41c0-851c-249452b838f3",
+      "name": "Disponibilidade de Exames",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "name": "CriaAgendamento",
+        "description": "Chame essa ferramenta quando for agendar exames. Você só pode agendar exames após o paciente enviar quais exames ele necessita, após o paciente definir as datas e horários dos exames e após ele confirmar que os dados estão corretos. \nNo input, o campo \"horário\" deve ser a **data completa**, formato ISO 8601.",
+        "workflowId": "MHIwZkd2vKLMTajt",
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n  \"nome\": \"nome do paciente\",\n  \"telefone\": \"telefone do paciente\",\n  \"cpf\": \"CPF do paciente\",\n  \"exames\": [{\n    \"exames\": [\"Raio X\", \"...\"],\n    \"unidade\": \"Tiradentes\",\n    \"horario\": \"2024-08-29 13:00:00\"\n  },{\n    \"exames\": [\"Hemograma\", \"Creatinina\", \"...\"],\n    \"unidade\": \"Osasco\",\n    \"horario\": \"2024-08-27 10:00:00\"\n  },{\n    \"exames\": [\"Exame 1\", \"Exame 2\", \"Exame 3\"],\n    \"unidade\": \"Localidade\",\n    \"horario\": \"1234-05-06 07:08:09\"\n  }]\n}"
+      },
+      "id": "3c81e582-b46a-4c17-b07c-4b972c91318d",
+      "name": "Criar Agendamento",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        1320,
+        540
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "f633059b-31e6-4c45-9d2d-ddb067c503fc",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        560,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "53116af5-d4e7-434b-ad40-5e6b0423b56a",
+              "leftValue": "={{ $json.data }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "dc015daa-2a79-4a01-a90f-ba118a1131f2",
+      "name": "Check for node \"data\"",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        340,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "sessionTTL": 900,
+        "contextWindowLength": 30
+      },
+      "id": "78980770-4297-45a6-b6a9-83a15c50b5a3",
+      "name": "Redis Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.3,
+      "position": [
+        900,
+        540
+      ],
+      "credentials": {
+        "redis": {
+          "id": "opjrjOVDdR8emN6d",
+          "name": "Local Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "Você é um assistente virtual de uma **clínica médica** especializado em **admissão de pacientes e agendamento de consultas e exames**. Sua missão é coletar todas as informações necessárias dos pacientes, organizar seus pedidos médicos, e fornecer informações sobre exames e preços de maneira clara e eficiente.\n\nMantenha sempre um tom **educado, profissional e atencioso**.\n\n#### Passos do Atendimento:\n1. **Apresentação Inicial:**\n   - Comece a conversa **se apresentando** e **explicando sua função** como assistente virtual. Em seguida, solicite as informações do paciente.\n\n2. **Colete as Informações do Paciente:**\n   - Solicite:\n     - `Nome completo`: pelo menos 2 palavras, separadas com espaço\n     - `Número de telefone`: 2 dígitos numéricos para representar a área e 9 dígitos numéricos para representar o telefone. o código de área é opcional. Podem haver traços, espaços e parênteses na digitação, que podem ser ignorados.\n     - `CPF`: 11 dígitos numéricos. Podem haver traços e pontos, que podem ser ignorados.\n   - A entrada de dados pode ser feita pelo paciente em uma única mensagem ou separada em mensagens distintas. Caso seja feito em mensagens distintas, identifique qual informação e diga o que ainda falta, de modo cordial.\n\n3. **Verificação de Convênio:**\n   - Pergunte ao paciente se ele possui:\n     - *Convênio médico* ou se irá pagar de forma *particular*.\n   - Armazene internamente essa informação como `\"forma_de_pagamento\"` com valores `\"convenio\"` ou `\"particular\"`.\n\n4. **Filtragem e Agrupamento de Exames:**\n   - Peça para o paciente listar quais exames precisa. O paciente pode escrever todos os exames em uma única mensagem ou em várias mensagens.\n   - Irá utilizar ferramenta.\n\n5. **Seleção de Datas para Agendamento:**\n   - Após utilizar ferramenta, peça para o paciente confirmar as datas de agendamento selecionadas.\n\n6. **Conclusão da Conversa:**\n   - Resuma as informações coletadas e detalhe os **próximos passos** para o paciente, incluindo como proceder com o agendamento.\n   - Pergunte se o paciente tem alguma **dúvida** ou se precisa de **clarificações** adicionais.\n   - Termine com uma mensagem **educada** e **profissional**.\n  \n7. **Reinício do Processo:**\n   - Se o paciente solicitar para \"começar de novo\" ou uma frase similar, **reinicie o processo**, descartando as informações anteriores e submetendo novamente as perguntas e solicitações desde o início.\n\n---\n\n#### Regras de Conduta:\n- **Repetições e Clarificações:** Esteja sempre disposto a repetir ou esclarecer qualquer informação, garantindo que o paciente compreenda totalmente o processo.\n- **Confidencialidade:** Lembre-se de que você está lidando com **informações sensíveis** da saúde dos pacientes; mantenha a discrição e respeite a privacidade.\n- **Foco na Missão:** **NUNCA** discuta qualquer tema que não esteja diretamente relacionado ao agendamento de consultas ou exames.\n- **Modo de Testes:** Caso o paciente envie uma mensagem com o texto \"teste 123!!\", ignore de forma excepcional a coleta dos dados pessoais e vá diretamente para a coleta dos nomes dos exames.\n\n## Formato de resposta ao paciente:\nO software do paciente não entende markdown. Texto em negrito é representado como *negrito* - com SOMENTE um asterisco. \nToda formatação extra deve ser feita com espaços e algum emoji que ajude a ilustrar uma hierarquia de informações, por exemplo. NÃO EXAGERE NOS EMOJIS, seja profissional.\n\n---\n"
+        }
+      },
+      "id": "a0be6889-38b3-4e52-b2df-5cb83eec33a3",
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        900,
+        300
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Twilio Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check for node \"data\"",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tipos de Exame": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disponibilidade de Exames": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Agendamento": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for node \"data\"": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Twilio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b057b897-08ed-4f6b-95ff-90b089ca8946",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "182c42047a2f6f544b4a863bf53dfb14d8cdbd7c0ff256347427e1c9ee3c1493"
+  },
+  "id": "gj5dd1HBOLGBpgMo",
+  "tags": [
+    {
+      "createdAt": "2024-08-27T12:38:29.486Z",
+      "updatedAt": "2024-08-27T12:38:29.486Z",
+      "id": "Aq6rUzvxNf2dnLxT",
+      "name": "cafe tech"
+    },
+    {
+      "createdAt": "2024-08-27T12:36:04.067Z",
+      "updatedAt": "2024-08-27T12:36:04.067Z",
+      "id": "MepVBYG6ZsSOK1oL",
+      "name": "whatsapp"
+    },
+    {
+      "createdAt": "2024-08-27T12:36:08.069Z",
+      "updatedAt": "2024-08-27T12:36:08.069Z",
+      "id": "RHZStTalyO36LHF8",
+      "name": "openai"
+    },
+    {
+      "createdAt": "2024-08-27T12:35:54.446Z",
+      "updatedAt": "2024-08-27T12:35:54.446Z",
+      "id": "W4AXlHqTvVhtJQjZ",
+      "name": "apresentacao"
+    },
+    {
+      "createdAt": "2024-08-27T12:36:01.438Z",
+      "updatedAt": "2024-08-27T12:36:01.438Z",
+      "id": "b5lVGnjpQ2IsOIA1",
+      "name": "twilio"
+    },
+    {
+      "createdAt": "2024-08-27T13:55:39.943Z",
+      "updatedAt": "2024-08-27T13:55:39.943Z",
+      "id": "g1J9bVxM4tl3sStr",
+      "name": "clinica"
+    }
+  ]
+}

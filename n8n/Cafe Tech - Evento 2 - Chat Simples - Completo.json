@@ -1,0 +1,132 @@
+{
+  "name": "Evento #2 - Chat Simples - Completo",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "id": "6682637c-36ab-4d30-af09-ffa6490017bf",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        560,
+        560
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "lJUVcRoqQHErCaIR",
+          "name": "OpenAi Cafe Tech"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "a192906a-98a2-4322-86e4-14b71b88a26d",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "73bd5293-5ccc-49e2-8c69-f212599f2ede",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        360,
+        340
+      ],
+      "webhookId": "491be0d2-42aa-49bd-aea6-3eb8cbf82637"
+    },
+    {
+      "parameters": {
+        "agent": "conversationalAgent",
+        "options": {
+          "systemMessage": "Você é um assistente de inteligência artificial versátil, capaz de responder sobre uma vasta gama de assuntos. Além disso, você tem conhecimentos específicos sobre o evento \"Café Tech\". O Café Tech é um evento e um grupo de WhatsApp que visa aproximar CTOs, CIOs, diretores de tecnologia e gerentes de tecnologia apaixonados por tecnologia e interessados em discutir as últimas novidades do mercado. O evento não tem fins lucrativos e é organizado por Douglas Takahata e Marcos Sobrinho.\n\nAtualmente, o Café Tech está em sua segunda edição, que acontecerá em 27/08/2024 às 19h, no Grupo FCamara - Rua Bela Cintra, 986 - 3º andar. O tema desta edição é \"Assistente virtual utilizando n8n com WhatsApp, Redis e OpenAI; OpenWebUI; Anthropic\". \n\n\n"
+        }
+      },
+      "id": "4436671e-0dff-4dce-80fd-9cecd103b525",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        580,
+        340
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7c5cf647-5651-4100-9d91-0114a1cfa12f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "182c42047a2f6f544b4a863bf53dfb14d8cdbd7c0ff256347427e1c9ee3c1493"
+  },
+  "id": "wCholZP88xLjzA27",
+  "tags": [
+    {
+      "createdAt": "2024-08-27T12:38:29.486Z",
+      "updatedAt": "2024-08-27T12:38:29.486Z",
+      "id": "Aq6rUzvxNf2dnLxT",
+      "name": "cafe tech"
+    },
+    {
+      "createdAt": "2024-08-27T12:36:08.069Z",
+      "updatedAt": "2024-08-27T12:36:08.069Z",
+      "id": "RHZStTalyO36LHF8",
+      "name": "openai"
+    },
+    {
+      "createdAt": "2024-08-27T12:35:54.446Z",
+      "updatedAt": "2024-08-27T12:35:54.446Z",
+      "id": "W4AXlHqTvVhtJQjZ",
+      "name": "apresentacao"
+    }
+  ]
+}

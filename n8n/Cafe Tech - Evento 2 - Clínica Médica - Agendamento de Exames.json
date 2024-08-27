@@ -1,0 +1,242 @@
+{
+  "name": "Evento #2 - Clínica Médica - Agendamento de Exames",
+  "nodes": [
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "56c3855d759059dbfe8b2a682d4e83c5ad1a364c69f3e355b8391e6b82c2ece6@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Agendamentos da Clínica (Café Tech)"
+        },
+        "start": "={{ $json['query.exames'].horario }}",
+        "end": "={{ Date.parse($json['query.exames'].horario + '-03:00').toDateTime().plus(2, 'hour').toISO() }}",
+        "additionalFields": {
+          "attendees": [],
+          "description": "=Agendamento de exames: {{ $json['query.exames'].exames.join(', ') }}\nUnidade: {{ $json['query.exames'].unidade }}\n\nPaciente: {{ $json['query.nome'] }}\nTelefone: {{ $json['query.telefone'] }}\nCPF: {{ $json['query.cpf'] }}\n",
+          "guestsCanInviteOthers": true,
+          "summary": "=Agendamento - {{ $json['query.nome'] }}"
+        }
+      },
+      "id": "c7fc7dec-b322-413e-b679-cb77385a5e79",
+      "name": "Google Calendar",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        380
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "DIFT4ADF2yLHIgkY",
+          "name": "Google Calendar Cafe Tech"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "f8981e73-2319-4f92-ad63-6fc25f034ba8",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        380
+      ],
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "query.exames",
+        "include": "selectedOtherFields",
+        "fieldsToInclude": "query.nome, query.telefone, query.cpf",
+        "options": {}
+      },
+      "id": "148749c1-3a14-44d4-9774-ac77905ab060",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        420,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "a0a6534c-a75d-447e-8131-1d27f8ffa1c6",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "confirmed",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "cf4f38b4-e7bc-453b-be90-cf0011a23871",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "status"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5067ab60-ddfa-42a9-9603-1857ba0476dd",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        880,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"response\": \"Avise o paciente que os exames (total : {{ $json.status.length }}) foram agendados com sucesso. Agradeça o paciente e finalize o atendimento!\",\n}\n ",
+        "options": {}
+      },
+      "id": "175318cb-5ae1-4514-9aa0-2cf4f314c2f9",
+      "name": "Response Prompt",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1320,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "Impossível criar agendamento!"
+      },
+      "id": "2eaf9ed5-a81c-41a8-a1cd-e388d81ac99d",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        480
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Calendar": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Google Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Response Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "794b1498-c40d-4126-9413-be43cdf29f02",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "182c42047a2f6f544b4a863bf53dfb14d8cdbd7c0ff256347427e1c9ee3c1493"
+  },
+  "id": "MHIwZkd2vKLMTajt",
+  "tags": [
+    {
+      "name": "cafe tech",
+      "id": "Aq6rUzvxNf2dnLxT",
+      "createdAt": "2024-08-27T12:38:29.486Z",
+      "updatedAt": "2024-08-27T12:38:29.486Z"
+    },
+    {
+      "name": "apresentacao",
+      "id": "W4AXlHqTvVhtJQjZ",
+      "createdAt": "2024-08-27T12:35:54.446Z",
+      "updatedAt": "2024-08-27T12:35:54.446Z"
+    },
+    {
+      "name": "google calendar",
+      "id": "t47gA2zj9QCcIiAX",
+      "createdAt": "2024-08-27T12:38:03.776Z",
+      "updatedAt": "2024-08-27T12:38:03.776Z"
+    }
+  ]
+}

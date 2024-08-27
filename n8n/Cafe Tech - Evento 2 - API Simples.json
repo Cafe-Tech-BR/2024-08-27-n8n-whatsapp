@@ -1,0 +1,209 @@
+{
+  "name": "Evento #2 - API Simples",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "ea5b64a7-fe8c-4d4b-a878-e41e48d84650",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        520,
+        260
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "httpMethod": [
+          "GET"
+        ],
+        "path": "api-simples",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {
+          "rawBody": false
+        }
+      },
+      "id": "ea96e773-e264-4f2c-b0f1-4da5235ee92c",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        520,
+        480
+      ],
+      "webhookId": "74409d16-3009-41bc-ab24-394371700204"
+    },
+    {
+      "parameters": {
+        "url": "https://www.uol.com.br/vueland/api/?loadComponent=XmlFeedRss",
+        "options": {}
+      },
+      "id": "88fd32e6-f07f-42f7-831e-3c1b9e1f8f1a",
+      "name": "RSS UOL",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        740,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "553ec395-e576-4098-89c8-5b1ec64b2041",
+              "leftValue": "={{ $json.pubDate }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e7594eae-25ce-4dcc-9178-de3c26360e52",
+      "name": "Filtra notícia sem data UOL",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [
+        960,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3120128c-0aa0-4f29-b819-fc52055a1bf5",
+              "name": "url",
+              "value": "={{ $json.link }}",
+              "type": "string"
+            },
+            {
+              "id": "370c4984-90a1-49bf-92dc-64ada57db400",
+              "name": "date",
+              "value": "={{ $json.isoDate }}",
+              "type": "string"
+            },
+            {
+              "id": "558800f5-138b-4a56-820f-66d490f09b50",
+              "name": "title",
+              "value": "={{ $json.content.trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "ab73111b-533e-4778-a72e-a139ccf394bf",
+              "name": "content",
+              "value": "={{ $json['content:encoded'].trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "87b89ee0-754b-494a-8763-4def355cec29",
+      "name": "Monta objeto de saída UOL",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1180,
+        360
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "RSS UOL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "RSS UOL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS UOL": {
+      "main": [
+        [
+          {
+            "node": "Filtra notícia sem data UOL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtra notícia sem data UOL": {
+      "main": [
+        [
+          {
+            "node": "Monta objeto de saída UOL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monta objeto de saída UOL": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "af70c38a-a30e-4180-ae1a-37298b2f79fc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "182c42047a2f6f544b4a863bf53dfb14d8cdbd7c0ff256347427e1c9ee3c1493"
+  },
+  "id": "zY0AeqMcHIk40VR7",
+  "tags": [
+    {
+      "name": "apresentacao",
+      "id": "W4AXlHqTvVhtJQjZ",
+      "createdAt": "2024-08-27T12:35:54.446Z",
+      "updatedAt": "2024-08-27T12:35:54.446Z"
+    },
+    {
+      "name": "cafe tech",
+      "id": "Aq6rUzvxNf2dnLxT",
+      "createdAt": "2024-08-27T12:38:29.486Z",
+      "updatedAt": "2024-08-27T12:38:29.486Z"
+    },
+    {
+      "name": "http",
+      "id": "xAsrXVATHDkyqMUU",
+      "createdAt": "2024-08-27T13:24:52.488Z",
+      "updatedAt": "2024-08-27T13:24:52.488Z"
+    }
+  ]
+}
