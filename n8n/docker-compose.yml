@@ -1,0 +1,32 @@
+name: lowcode-n8n
+
+services:
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 512M
+    restart: always
+
+  n8n:
+    image: "docker.n8n.io/n8nio/n8n"
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8ndata:/home/node/.n8n
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 512M
+    restart: always
+
+volumes:
+  pgdata:
+  n8ndata:

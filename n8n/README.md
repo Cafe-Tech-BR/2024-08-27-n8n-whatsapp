@@ -46,7 +46,6 @@ Você pode executar o n8n localmente usando o Docker Compose. Para isso, siga os
 
 4. Acesse o n8n em [http://localhost:5678](http://localhost:5678).
 
-*Se necessário, adicione um printscreen do terminal e da interface do Docker.*
 
 ### Linux
 
@@ -60,7 +59,6 @@ Você pode executar o n8n localmente usando o Docker Compose. Para isso, siga os
 
 4. Acesse o n8n em [http://localhost:5678](http://localhost:5678).
 
-*Caso necessário, insira uma imagem do terminal Linux e da interface do Docker.*
 
 ### Mac
 
